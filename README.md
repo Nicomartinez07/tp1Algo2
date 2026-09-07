@@ -38,7 +38,7 @@
 
 ### 1.1. Compilar el proyecto
 ```bash
-comando
+gcc -g -c src/leer_linea.c src/main.c -o leer_linea.o
 ```
 
 ### 1.2. Ejecutar las pruebas
@@ -48,7 +48,7 @@ comando
 
 ### 1.3. Ejecutar el programa con Valgrind
 ```bash
-comando
+valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./leer_linea 
 ```
 
 ## 2. Funcionamiento
