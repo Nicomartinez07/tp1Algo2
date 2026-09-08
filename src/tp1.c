@@ -363,8 +363,6 @@ tp1_t *tp1_escribir_archivo(tp1_t *tp1, const char *nombre) {
     return NULL;
   }
 
-  size_t i = 0;
-
   for (size_t i = 0; i < tp1->cantidad; i++) {
     struct pokemon actual = tp1->pokemones[i];
     char rareza = convertir_rareza_a_caracter(actual.rareza);
