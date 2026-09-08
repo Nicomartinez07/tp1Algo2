@@ -103,6 +103,10 @@ char convertir_rareza_a_caracter(enum rareza_pokemon rareza) {
 }
 
 void ordenar_vector(struct pokemon *pokemones, size_t tope) {
+  if (tope <= 1 || pokemones == NULL) {
+    return;
+  }
+
   for (size_t i = 0; i < tope - 1; i++) {
     for (size_t j = 0; j < tope - 1 - i; j++) {
       struct pokemon aux;
@@ -129,14 +133,13 @@ int guardar_pokemones(FILE *archivo, tp1_t *estructura) {
 
   while (leer_linea_ptr(&linea, &tamaño_inicial, archivo) >= 0 && !hay_error) {
     char *coma = strchr(linea, CARACTER_COMA);
-    if (coma != NULL) {
-    }
 
     if (coma != NULL) {
       size_t longitud_nombre = (size_t)(coma - linea);
 
       char *nombre_pokemon = malloc(longitud_nombre + 1 * sizeof(char));
       if (!nombre_pokemon) {
+        free(linea);
         return ERROR;
       }
 
@@ -171,15 +174,19 @@ int guardar_pokemones(FILE *archivo, tp1_t *estructura) {
           struct pokemon *aux = realloc(
               estructura->pokemones, sizeof(struct pokemon) * nueva_capacidad);
           if (!aux) {
+            free(nombre_pokemon);
             hay_error = true;
           } else {
             estructura->pokemones = aux;
             estructura->capacidad = nueva_capacidad;
           }
         }
-
-        estructura->pokemones[estructura->cantidad] = actual;
-        estructura->cantidad++;
+        if (!hay_error) {
+          estructura->pokemones[estructura->cantidad] = actual;
+          estructura->cantidad++;
+        }
+      } else {
+        free(nombre_pokemon);
       }
     }
   }

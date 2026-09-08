@@ -3,28 +3,28 @@
 const int CANTIDAD_MINIMA_PARAMETROS = 3;
 
 int main(int argc, char const *argv[]) {
-  if (argc > CANTIDAD_MINIMA_ARGUMENTOS) {
+  if (argc > CANTIDAD_MINIMA_PARAMETROS) {
     printf("Se deben ingresar como minimo 3 parametros para el correcto "
            "funcionamiento del programa.\n Uso: ./ejecutable <archivo_a_leer> "
            "<funcion_a_ejecutar> <extras>\n");
     return ERROR;
   }
 
-  if (argc == 4) {
-    tp1_t *pokedex = tp1_leer_archivo(argv[2]);
-    if (pokedex == NULL) {
-      return ERROR;
-    }
+  tp1_t *pokedex = tp1_leer_archivo(argv[2]);
+  if (pokedex == NULL) {
+    return ERROR;
+  }
 
+  if (argc == 4) {
     struct pokemon *buscado = tp1_buscar_pokemon(pokedex, argv[3]);
     if (!buscado) {
       printf("Hubo un error al encontrar el pokemon buscado\n");
     } else {
       printf("El pokemon buscado es: \n");
-      printf("Nombre: %s\n", buscado.nombre);
-      printf("Velocidad: %i\n", buscado.velocidad);
-      printf("Peso: %f\n", buscado.peso);
-      printf("Rareza: %s\n", buscado.rareza);
+      printf("Nombre: %s\n", buscado->nombre);
+      printf("Velocidad: %i\n", buscado->velocidad);
+      printf("Peso: %f\n", buscado->peso);
+      printf("Rareza: %s\n", buscado->rareza);
     }
   }
   return 0;
