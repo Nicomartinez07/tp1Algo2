@@ -1,3 +1,5 @@
+<p align="center"><a href="https://xanubot.a2m.com.ar/jobs/919"><img src="https://xanubot.a2m.com.ar/badges/919" alt="Xanubot"></a>
+
 <div align="right">
     <img width="32px" src="img/algo2.svg">
 </div>
@@ -38,7 +40,7 @@
 
 ### 1.1. Compilar el proyecto
 ```bash
-comando
+gcc -g -c src/leer_linea.c src/main.c -o leer_linea.o
 ```
 
 ### 1.2. Ejecutar las pruebas
@@ -48,7 +50,7 @@ comando
 
 ### 1.3. Ejecutar el programa con Valgrind
 ```bash
-comando
+valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./leer_linea 
 ```
 
 ## 2. Funcionamiento
