@@ -12,4 +12,6 @@
 
 void pruebas_leer_linea();
 
+void pruebas_buscar();
+
 #endif // PRUEBAS_H_
