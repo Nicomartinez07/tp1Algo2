@@ -11,6 +11,10 @@
 #define FORMATO_LECTURA_SIN_NOMBRE "%d,%f,%c\n"
 #define FORMATO_ESCRITURA "%s,%i,%f,%c\n"
 
+#define RARO 'R'
+#define COMUN 'C'
+#define LEGENDARIO 'L'
+
 struct tp1 {
   struct pokemon *pokemones;
   size_t cantidad;
@@ -25,9 +29,6 @@ const int POKEMON_NO_ENCONTRADO = 0;
 const float VELOCIDAD_MINIMA = 1;
 const int VELOCIDAD_MAXIMA = 99;
 const int CANTIDAD_LEIDOS_POR_LINEA = 3;
-const char COMUN = 'C';
-const char RARO = 'R';
-const char LEGENDARIO = 'L';
 const char CARACTER_COMA = ',';
 const int LONGITUD_INICIAL_NOMBRE = 100;
 
@@ -38,7 +39,7 @@ const int LONGITUD_INICIAL_NOMBRE = 100;
  */
 int duplicar_pokemon(struct pokemon original, struct pokemon *copia) {
   size_t longitud_nombre = strlen(original.nombre);
-  copia->nombre = malloc(sizeof(char) * longitud_nombre + 1);
+  copia->nombre = malloc((longitud_nombre + 1) * sizeof(char));
   if (!copia->nombre) {
     return ERROR;
   }
@@ -111,15 +112,15 @@ bool convertir_caracter_a_rareza(char caracter, enum rareza_pokemon *rareza) {
 char convertir_rareza_a_caracter(enum rareza_pokemon rareza) {
   char caracter = ' ';
   switch (rareza) {
-  case RAREZA_COMUN:
-    caracter = COMUN;
-    break;
-  case RAREZA_LEGENDARIO:
-    caracter = LEGENDARIO;
-    break;
-  case RAREZA_RARO:
-    caracter = RARO;
-    break;
+    case RAREZA_COMUN:
+      caracter = COMUN;
+      break;
+    case RAREZA_LEGENDARIO:
+      caracter = LEGENDARIO;
+      break;
+    case RAREZA_RARO:
+      caracter = RARO;
+      break;
   }
 
   return caracter;
@@ -440,12 +441,11 @@ struct pokemon *tp1_buscar_pokemon(tp1_t *tp1, const char *nombre) {
  * En caso de error devuelve NULL
  */
 struct pokemon *tp1_buscar_orden(tp1_t *tp1, size_t n) {
-  if (n >= tp1->cantidad) {
-    printf("Hay menos pokemones en el tp1 que N elementos");
+  if (n == 0 || n >= tp1->cantidad) {
     return NULL;
   }
 
-  return &tp1->pokemones[n];
+  return &tp1->pokemones[n-1];
 }
 
 /**
