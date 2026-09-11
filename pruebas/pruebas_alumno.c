@@ -14,8 +14,11 @@ int main() {
   pa2m_nuevo_grupo("Pruebas de buscar");
   pruebas_buscar();
 
-  pa2m_nuevo_grupo("Pruebas de buscar");
+  pa2m_nuevo_grupo("Pruebas de combinar");
   pruebas_combinar();
+
+  pa2m_nuevo_grupo("Pruebas de archivos");
+  pruebas_archivos();
 
   return pa2m_mostrar_reporte();
 }

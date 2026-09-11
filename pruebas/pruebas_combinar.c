@@ -53,7 +53,34 @@ void prueba_combinar_vacios() {
     tp1_destruir(tp3);
 }
 
+void prueba_cantidad_vacio() {
+    tp1_t *tp1 = tp1_leer_archivo("./pruebas/archivos/pokemones(vacio).csv");
+   
+    size_t cantidad = tp1_cantidad(tp1);
+    
+    pa2m_afirmar(cantidad == 0, "Se entrego un TP1 vacio y la cantidad de elementos es %i.\n", cantidad);
+
+    tp1_destruir(tp1);
+}
+
+void prueba_cantidad() {
+    tp1_t *tp1 = tp1_leer_archivo("./pruebas/archivos/pokemones.csv");
+   
+    size_t cantidad = tp1_cantidad(tp1);
+    
+    pa2m_afirmar(cantidad == 5, "Se entrego un TP1 con 5 elementos y la cantidad de elementos es %i.\n", cantidad);
+
+    tp1_destruir(tp1);
+}
+
 
 void pruebas_combinar() {
     pa2m_nuevo_grupo("Pruebas combinar");
+    prueba_combinar_longitud_6();
+    prueba_combinar_iguales();
+    prueba_combinar_vacios();
+
+    pa2m_nuevo_grupo("Pruebas cantidad");
+    prueba_cantidad_vacio();
+    prueba_cantidad();
 }
