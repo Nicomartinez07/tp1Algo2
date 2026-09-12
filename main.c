@@ -76,8 +76,8 @@ int main(int argc, char const *argv[])
 			if (!actual) {
 				printf("Hubo un error al imprimir el pokemon\n");
 			} else {
-				char rareza = obtener_caracter_rareza(
-					actual->rareza);
+				char rareza =
+					obtener_caracter_rareza(actual->rareza);
 				printf("El pokemon N: %zu es: \n",
 				       indice_random);
 				imprimir_pokemon(actual, rareza);
@@ -92,8 +92,8 @@ int main(int argc, char const *argv[])
 			if (!actual) {
 				printf("Hubo un error al imprimir el pokemon\n");
 			} else {
-				char rareza = obtener_caracter_rareza(
-					actual->rareza);
+				char rareza =
+					obtener_caracter_rareza(actual->rareza);
 				printf("El pokemon N: %zu es: \n", i);
 				imprimir_pokemon(actual, rareza);
 			}
@@ -124,8 +124,7 @@ int main(int argc, char const *argv[])
 		if (!buscado) {
 			printf("Hubo un error al encontrar el pokemon buscado\n");
 		} else {
-			char rareza =
-				obtener_caracter_rareza(buscado->rareza);
+			char rareza = obtener_caracter_rareza(buscado->rareza);
 			printf("El pokemon buscado es: \n");
 			imprimir_pokemon(buscado, rareza);
 		}
