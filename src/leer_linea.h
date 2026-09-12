@@ -11,7 +11,7 @@
  * Devuelve un puntero a un string reservado dinámicamente con malloc a liberar
  * por el usuario utilizando free o NULL en caso de error.
  */
-char *leer_linea(FILE* archivo);
+char *leer_linea(FILE *archivo);
 
 /**
  * Lee caracteres por entrada estándar hasta encontrar el fin de línea o no
@@ -26,6 +26,6 @@ char *leer_linea(FILE* archivo);
  * Devuelve la cantidad de caracteres leidos (sin incluír el 0 final) o -1 en
  * caso de error.
  */
-int leer_linea_ptr(char **ptr, size_t *tamaño, FILE* archivo);
+int leer_linea_ptr(char **ptr, size_t *tamaño, FILE *archivo);
 
 #endif // LEER_LINEA_H_
