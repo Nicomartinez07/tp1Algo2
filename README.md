@@ -1,4 +1,4 @@
-<p align="center"><a href="https://xanubot.a2m.com.ar/jobs/1279"><img src="https://xanubot.a2m.com.ar/badges/1279" alt="Xanubot"></a>
+<p align="center"><a href="https://xanubot.a2m.com.ar/jobs/1308"><img src="https://xanubot.a2m.com.ar/badges/1308" alt="Xanubot"></a>
 
 <div align="right">
     <img width="32px" src="img/algo2.svg">

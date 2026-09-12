@@ -57,7 +57,7 @@ void prueba_combinar_vacios()
 	tp1_t *tp3 = tp1_combinar(tp1, tp2);
 
 	pa2m_afirmar(
-		tp3 == NULL,
+		tp3 != NULL && tp1_cantidad(tp3) == 0,
 		"No se pudieron combinar los TP1, porque ambos estan vacios.\n");
 
 	tp1_destruir(tp1);

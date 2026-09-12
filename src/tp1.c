@@ -56,22 +56,30 @@ int duplicar_pokemon(struct pokemon original, struct pokemon *copia)
 	return EXITO;
 }
 
-/*
- * Devuelve true si el pokemon actual se encuentra en el vector, false en caso
- * contrario. La comparacion se realiza por nombre.
- */
-bool pokemon_esta_en_vector(struct pokemon actual, struct pokemon *pokemones,
-			    size_t tope)
+size_t buscar_posicion_para_insertar(struct pokemon *pokemones, size_t cantidad,
+				     const char *nombre, bool *encontrado)
 {
-	bool encontrado = false;
-	int i = 0;
-	while (i < tope && !encontrado) {
-		if (strcasecmp(pokemones[i].nombre, actual.nombre) == 0) {
-			encontrado = true;
+	size_t inicio = 0;
+	size_t fin = cantidad;
+
+	while (inicio < fin) {
+		size_t centro = inicio + (fin - inicio) / 2;
+		int comparacion = strcasecmp(pokemones[centro].nombre, nombre);
+
+		if (comparacion == 0) {
+			*encontrado = true;
+			return centro;
 		}
-		i++;
+
+		if (comparacion < 0) {
+			centro = centro + 1;
+		} else {
+			fin = centro;
+		}
 	}
-	return encontrado;
+
+	*encontrado = false;
+	return inicio;
 }
 
 /*
@@ -82,11 +90,8 @@ bool pokemon_valido(struct pokemon actual)
 	bool peso_valido = actual.peso > PESO_MINIMO;
 	bool velocidad_valida = actual.velocidad >= VELOCIDAD_MINIMA &&
 				actual.velocidad <= VELOCIDAD_MAXIMA;
-	bool rareza_apta = (actual.rareza == RAREZA_COMUN ||
-			    actual.rareza == RAREZA_RARO ||
-			    actual.rareza == RAREZA_LEGENDARIO);
 
-	return (peso_valido && velocidad_valida && rareza_apta);
+	return (peso_valido && velocidad_valida);
 }
 
 /*
@@ -202,8 +207,15 @@ int guardar_pokemones(FILE *archivo, tp1_t *estructura)
 						    &caracter_rareza,
 						    &caracteres_leidos);
 
-        char fin = (coma + 1)[caracteres_leidos];
-        bool sin_basura = (fin == '\0' || fin == '\n' || fin == '\r');
+				if (leidos != CANTIDAD_LEIDOS_POR_LINEA ||
+				    caracteres_leidos == 0) {
+					free(nombre_pokemon);
+					continue;
+				}
+
+				char fin = (coma + 1)[caracteres_leidos];
+				bool sin_basura = (fin == '\0' || fin == '\n' ||
+						   fin == '\r');
 
 				enum rareza_pokemon rareza;
 				bool rareza_valida =
@@ -216,40 +228,66 @@ int guardar_pokemones(FILE *archivo, tp1_t *estructura)
 				actual.velocidad = velocidad;
 				actual.rareza = rareza;
 
-				if (leidos == CANTIDAD_LEIDOS_POR_LINEA &&
-				    sin_basura &&
-				    pokemon_valido(actual) && rareza_valida &&
-				    !pokemon_esta_en_vector(
-					    actual, estructura->pokemones,
-					    estructura->cantidad)) {
-					if (estructura->cantidad >=
-					    estructura->capacidad) {
-						size_t nueva_capacidad =
-							estructura->capacidad *
-							2;
+				if (sin_basura && pokemon_valido(actual) &&
+				    rareza_valida) {
+					bool encontrado = false;
 
-						struct pokemon *aux = realloc(
+					size_t posicion =
+						buscar_posicion_para_insertar(
 							estructura->pokemones,
-							sizeof(struct pokemon) *
-								nueva_capacidad);
-						if (!aux) {
-							free(nombre_pokemon);
-							hay_error = true;
-						} else {
-							estructura->pokemones =
-								aux;
-							estructura->capacidad =
-								nueva_capacidad;
+							estructura->cantidad,
+							actual.nombre,
+							&encontrado);
+
+					if (!encontrado) {
+						if (estructura->cantidad >=
+						    estructura->capacidad) {
+							size_t nueva_capacidad =
+								estructura
+									->capacidad *
+								2;
+
+							struct pokemon *aux = realloc(
+								estructura
+									->pokemones,
+								sizeof(struct pokemon) *
+									nueva_capacidad);
+
+							if (!aux) {
+								free(nombre_pokemon);
+								hay_error =
+									true;
+							} else {
+								estructura
+									->pokemones =
+									aux;
+								estructura
+									->capacidad =
+									nueva_capacidad;
+							}
 						}
+						if (!hay_error) {
+							for (size_t i =
+								     estructura
+									     ->cantidad;
+							     i > posicion;
+							     i--) {
+								estructura->pokemones
+									[i] =
+									estructura
+										->pokemones
+											[i -
+											 1];
+							}
+
+							estructura->pokemones
+								[posicion] =
+								actual;
+							estructura->cantidad++;
+						}
+					} else {
+						free(nombre_pokemon);
 					}
-					if (!hay_error) {
-						estructura->pokemones
-							[estructura->cantidad] =
-							actual;
-						estructura->cantidad++;
-					}
-				} else {
-					free(nombre_pokemon);
 				}
 			}
 		}
@@ -309,7 +347,7 @@ tp1_t *tp1_leer_archivo(const char *nombre)
 		return NULL;
 	}
 
-	ordenar_vector(tp1->pokemones, tp1->cantidad);
+	//ordenar_vector(tp1->pokemones, tp1->cantidad);
 
 	return tp1;
 }

@@ -1,15 +1,34 @@
 #include "src/tp1.h"
 #include <string.h>
 #include <time.h>
+#include <stdio.h>
 
 #define MOSTRAR_TODO "mostrar-todo"
 #define MOSTRAR_UNO "mostrar-uno"
 #define MOSTRAR_RAREZAS "mostrar-rarezas"
 #define BUSCAR_NOMBRE "buscar-nombre"
+#define ERROR -1
 
-const int ERROR = -1;
 const int CANTIDAD_MINIMA_PARAMETROS = 3;
 const int CANTIDAD_BUSCAR_NOMBRE = 4;
+
+char convertir_rareza_a_caracte(enum rareza_pokemon rareza)
+{
+	char caracter = ' ';
+	switch (rareza) {
+	case RAREZA_COMUN:
+		caracter = 'C';
+		break;
+	case RAREZA_LEGENDARIO:
+		caracter = 'L';
+		break;
+	case RAREZA_RARO:
+		caracter = 'R';
+		break;
+	}
+
+	return caracter;
+}
 
 void imprimir_pokemon(struct pokemon *actual, char rareza)
 {
@@ -27,7 +46,7 @@ bool tiene_cierta_rareza(struct pokemon *p, void *extra)
 	}
 
 	if (p->rareza == *((enum rareza_pokemon *)extra)) {
-		char rareza = convertir_rareza_a_caracter(p->rareza);
+		char rareza = convertir_rareza_a_caracte(p->rareza);
 		imprimir_pokemon(p, rareza);
 	}
 	return true;
@@ -60,7 +79,7 @@ int main(int argc, char const *argv[])
 			if (!actual) {
 				printf("Hubo un error al imprimir el pokemon\n");
 			} else {
-				char rareza = convertir_rareza_a_caracter(
+				char rareza = convertir_rareza_a_caracte(
 					actual->rareza);
 				printf("El pokemon N: %zu es: \n",
 				       indice_random);
@@ -76,7 +95,7 @@ int main(int argc, char const *argv[])
 			if (!actual) {
 				printf("Hubo un error al imprimir el pokemon\n");
 			} else {
-				char rareza = convertir_rareza_a_caracter(
+				char rareza = convertir_rareza_a_caracte(
 					actual->rareza);
 				printf("El pokemon N: %zu es: \n", i);
 				imprimir_pokemon(actual, rareza);
@@ -109,7 +128,7 @@ int main(int argc, char const *argv[])
 			printf("Hubo un error al encontrar el pokemon buscado\n");
 		} else {
 			char rareza =
-				convertir_rareza_a_caracter(buscado->rareza);
+				convertir_rareza_a_caracte(buscado->rareza);
 			printf("El pokemon buscado es: \n");
 			imprimir_pokemon(buscado, rareza);
 		}
