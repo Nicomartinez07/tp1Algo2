@@ -202,11 +202,8 @@ int guardar_pokemones(FILE *archivo, tp1_t *estructura)
 						    &caracter_rareza,
 						    &caracteres_leidos);
 
-				bool sin_basura_al_final =
-					((coma + 1)[caracteres_leidos] ==
-						 CARACTER_SALTO_LINEA ||
-					 (coma + 1)[caracteres_leidos] ==
-						 CARACTER_NULO);
+        char fin = (coma + 1)[caracteres_leidos];
+        bool sin_basura = (fin == '\0' || fin == '\n' || fin == '\r');
 
 				enum rareza_pokemon rareza;
 				bool rareza_valida =
@@ -220,7 +217,7 @@ int guardar_pokemones(FILE *archivo, tp1_t *estructura)
 				actual.rareza = rareza;
 
 				if (leidos == CANTIDAD_LEIDOS_POR_LINEA &&
-				    sin_basura_al_final &&
+				    sin_basura &&
 				    pokemon_valido(actual) && rareza_valida &&
 				    !pokemon_esta_en_vector(
 					    actual, estructura->pokemones,
