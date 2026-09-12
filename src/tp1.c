@@ -72,7 +72,7 @@ size_t buscar_posicion_para_insertar(struct pokemon *pokemones, size_t cantidad,
 		}
 
 		if (comparacion < 0) {
-			centro = centro + 1;
+			inicio = centro + 1;
 		} else {
 			fin = centro;
 		}
@@ -266,6 +266,7 @@ int guardar_pokemones(FILE *archivo, tp1_t *estructura)
 									nueva_capacidad;
 							}
 						}
+
 						if (!hay_error) {
 							for (size_t i =
 								     estructura
@@ -288,6 +289,9 @@ int guardar_pokemones(FILE *archivo, tp1_t *estructura)
 					} else {
 						free(nombre_pokemon);
 					}
+
+				} else {
+					free(nombre_pokemon);
 				}
 			}
 		}
