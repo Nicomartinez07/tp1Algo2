@@ -56,6 +56,12 @@ int duplicar_pokemon(struct pokemon original, struct pokemon *copia)
 	return EXITO;
 }
 
+/*
+ * Busca una posicion en pokemones para insertar posteriormente el nuevo pokemon. La comparacion se realiza mediante el nombre.
+ * En caso de que la encuentre devuelve la posicion y true en el parametro encontrado.
+ * 
+ * En caso de no encontrar la posicion, devuelve false en encontrado.
+ */
 size_t buscar_posicion_para_insertar(struct pokemon *pokemones, size_t cantidad,
 				     const char *nombre, bool *encontrado)
 {
@@ -83,7 +89,9 @@ size_t buscar_posicion_para_insertar(struct pokemon *pokemones, size_t cantidad,
 }
 
 /*
- * Devuelve true si el pokemon es valido, false en caso contrario.
+ * Devuelve true si el pokemon tiene un peso mayor a PESO_MINIMO, y su velocidad esta entre VELOCIDAD_MINIMA y VELOCIDAD_MAXIMA.
+ *
+ * Devuelve false en caso contrario.
  */
 bool pokemon_valido(struct pokemon actual)
 {
@@ -142,32 +150,10 @@ char convertir_rareza_a_caracter(enum rareza_pokemon rareza)
 }
 
 /*
- * Ordena el vector de pokemones por nombre.
- * Tope tiene que representar la cantidad de elementos del vector.
- */
-void ordenar_vector(struct pokemon *pokemones, size_t tope)
-{
-	if (tope <= 0 || pokemones == NULL) {
-		return;
-	}
-
-	for (size_t i = 0; i < tope - 1; i++) {
-		for (size_t j = 0; j < tope - 1 - i; j++) {
-			struct pokemon aux;
-
-			if (strcasecmp(pokemones[j].nombre,
-				       pokemones[j + 1].nombre) > 0) {
-				aux = pokemones[j];
-				pokemones[j] = pokemones[j + 1];
-				pokemones[j + 1] = aux;
-			}
-		}
-	}
-}
-
-/*
- *  El archivo tiene que estar abierto en modo lectura. Lee el archivo y guarda
- * los pokemones en la estructura. Devuelve ERROR en caso de error.
+ * El archivo tiene que estar abierto en modo lectura. Lee el archivo y guarda
+ * los pokemones en la estructura. 
+ * 
+ * Devuelve ERROR en caso de error.
  */
 int guardar_pokemones(FILE *archivo, tp1_t *estructura)
 {
@@ -350,8 +336,6 @@ tp1_t *tp1_leer_archivo(const char *nombre)
 		free(tp1);
 		return NULL;
 	}
-
-	//ordenar_vector(tp1->pokemones, tp1->cantidad);
 
 	return tp1;
 }
@@ -551,7 +535,7 @@ struct pokemon *tp1_buscar_orden(tp1_t *tp1, size_t n)
  * Recorre los pokemon del TP1 aplicando la función f a cada uno. Si f devuelve
  * true, sigue iterando.
  *
- * Devuelve la cantidad de veces que se invocó f.
+ * Devuelve la cantidad de veces que se invocó f. 
  */
 size_t tp1_iterar(tp1_t *tp1, bool (*f)(struct pokemon *, void *), void *extra)
 {

@@ -12,22 +12,18 @@
 const int CANTIDAD_MINIMA_PARAMETROS = 3;
 const int CANTIDAD_BUSCAR_NOMBRE = 4;
 
-char convertir_rareza_a_caracte(enum rareza_pokemon rareza)
+char obtener_caracter_rareza(enum rareza_pokemon rareza)
 {
-	char caracter = ' ';
 	switch (rareza) {
 	case RAREZA_COMUN:
-		caracter = 'C';
-		break;
-	case RAREZA_LEGENDARIO:
-		caracter = 'L';
-		break;
+		return 'C';
 	case RAREZA_RARO:
-		caracter = 'R';
-		break;
+		return 'R';
+	case RAREZA_LEGENDARIO:
+		return 'L';
 	}
 
-	return caracter;
+	return '\0';
 }
 
 void imprimir_pokemon(struct pokemon *actual, char rareza)
@@ -46,7 +42,7 @@ bool tiene_cierta_rareza(struct pokemon *p, void *extra)
 	}
 
 	if (p->rareza == *((enum rareza_pokemon *)extra)) {
-		char rareza = convertir_rareza_a_caracte(p->rareza);
+		char rareza = obtener_caracter_rareza(p->rareza);
 		imprimir_pokemon(p, rareza);
 	}
 	return true;
@@ -72,14 +68,15 @@ int main(int argc, char const *argv[])
 
 	if (strcmp(argv[2], MOSTRAR_UNO) == 0) {
 		if (tp1_cantidad(pokedex) > 0) {
-			size_t indice_random = rand() % tp1_cantidad(pokedex);
+			size_t indice_random =
+				(size_t)rand() % tp1_cantidad(pokedex);
 
 			struct pokemon *actual =
 				tp1_buscar_orden(pokedex, indice_random);
 			if (!actual) {
 				printf("Hubo un error al imprimir el pokemon\n");
 			} else {
-				char rareza = convertir_rareza_a_caracte(
+				char rareza = obtener_caracter_rareza(
 					actual->rareza);
 				printf("El pokemon N: %zu es: \n",
 				       indice_random);
@@ -95,7 +92,7 @@ int main(int argc, char const *argv[])
 			if (!actual) {
 				printf("Hubo un error al imprimir el pokemon\n");
 			} else {
-				char rareza = convertir_rareza_a_caracte(
+				char rareza = obtener_caracter_rareza(
 					actual->rareza);
 				printf("El pokemon N: %zu es: \n", i);
 				imprimir_pokemon(actual, rareza);
@@ -128,7 +125,7 @@ int main(int argc, char const *argv[])
 			printf("Hubo un error al encontrar el pokemon buscado\n");
 		} else {
 			char rareza =
-				convertir_rareza_a_caracte(buscado->rareza);
+				obtener_caracter_rareza(buscado->rareza);
 			printf("El pokemon buscado es: \n");
 			imprimir_pokemon(buscado, rareza);
 		}
@@ -146,24 +143,3 @@ int main(int argc, char const *argv[])
 	}
 	return 0;
 }
-
-/*
-./tp1 pokedex.csv buscar-nombre magikarp: Busca un pokemon con el nombre
-magikarp y muestra sus datos por pantalla. -> buscar_nombre()
-
-
-./tp1 pokedex.csv mostrar-uno: Busca un pokemon al azar y lo muestra por
-pantalla con sus datos -> Se puede implementar una funcion que pida la cantidad
-total, y desde 0 hasta esa cantidad generar un random y ese numero random
-pasarselo al buscar n esimo()
-
-
-./tp1 pokedex.csv mostrar-todo: Muestra todos los pokemon por orden alfabetico.
--> Se podria utilizar la funcion de buscar_n para ir recorriendo haciendo un
-bucle por la cantidad de pokemones que tenga
-
-
-
-./tp1 pokedex.csv mostrar-rarezas: Muestra todos los pokemon agrupados por
-rareza. -> Funcion iteradora
-*/

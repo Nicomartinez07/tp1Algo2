@@ -97,8 +97,7 @@ void prueba_archivo_con_csv_vacio()
 		tp1_leer_archivo("./pruebas/archivos/pokemones(vacio).csv");
 	tp1 = tp1_escribir_archivo(tp1, nombre_archivo);
 	pa2m_afirmar(tp1 != NULL,
-		     "El archivo es esta vacio, y el puntero no es NULL "
-		     "por carga de csv vacio.\n");
+		     "El archivo es esta vacio por carga de csv vacio.\n");
 
 	tp1_destruir(tp1);
 	remove(nombre_archivo);
