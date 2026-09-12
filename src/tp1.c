@@ -142,7 +142,7 @@ char convertir_rareza_a_caracter(enum rareza_pokemon rareza)
  */
 void ordenar_vector(struct pokemon *pokemones, size_t tope)
 {
-	if (tope <= 1 || pokemones == NULL) {
+	if (tope <= 0 || pokemones == NULL) {
 		return;
 	}
 
@@ -181,72 +181,79 @@ int guardar_pokemones(FILE *archivo, tp1_t *estructura)
 		if (coma != NULL) {
 			size_t longitud_nombre = (size_t)(coma - linea);
 
-			char *nombre_pokemon =
-				malloc(longitud_nombre + 1 * sizeof(char));
-			if (!nombre_pokemon) {
-				free(linea);
-				return ERROR;
-			}
+			if (longitud_nombre != 0) {
+				char *nombre_pokemon = malloc(
+					(longitud_nombre + 1) * sizeof(char));
+				if (!nombre_pokemon) {
+					free(linea);
+					return ERROR;
+				}
 
-			strncpy(nombre_pokemon, linea, longitud_nombre);
-			nombre_pokemon[longitud_nombre] = '\0';
+				strncpy(nombre_pokemon, linea, longitud_nombre);
+				nombre_pokemon[longitud_nombre] = '\0';
 
-			char caracter_rareza = ' ';
-			int velocidad = 0;
-			float peso = 0;
+				char caracter_rareza = ' ';
+				int velocidad = 0;
+				float peso = 0;
 
-			int caracteres_leidos = 0;
-			int leidos = sscanf(coma + 1, "%d,%f,%c%n", &velocidad,
-					    &peso, &caracter_rareza,
-					    &caracteres_leidos);
+				int caracteres_leidos = 0;
+				int leidos = sscanf(coma + 1, "%d,%f,%c%n",
+						    &velocidad, &peso,
+						    &caracter_rareza,
+						    &caracteres_leidos);
 
-			bool sin_basura_al_final =
-				((coma + 1)[caracteres_leidos] ==
-					 CARACTER_SALTO_LINEA ||
-				 (coma + 1)[caracteres_leidos] ==
-					 CARACTER_NULO);
+				bool sin_basura_al_final =
+					((coma + 1)[caracteres_leidos] ==
+						 CARACTER_SALTO_LINEA ||
+					 (coma + 1)[caracteres_leidos] ==
+						 CARACTER_NULO);
 
-			enum rareza_pokemon rareza;
-			bool rareza_valida = convertir_caracter_a_rareza(
-				caracter_rareza, &rareza);
+				enum rareza_pokemon rareza;
+				bool rareza_valida =
+					convertir_caracter_a_rareza(
+						caracter_rareza, &rareza);
 
-			struct pokemon actual;
-			actual.nombre = nombre_pokemon;
-			actual.peso = peso;
-			actual.velocidad = velocidad;
-			actual.rareza = rareza;
+				struct pokemon actual;
+				actual.nombre = nombre_pokemon;
+				actual.peso = peso;
+				actual.velocidad = velocidad;
+				actual.rareza = rareza;
 
-			if (leidos == CANTIDAD_LEIDOS_POR_LINEA &&
-			    sin_basura_al_final && pokemon_valido(actual) &&
-			    rareza_valida &&
-			    !pokemon_esta_en_vector(actual,
-						    estructura->pokemones,
-						    estructura->cantidad)) {
-				if (estructura->cantidad >=
-				    estructura->capacidad) {
-					size_t nueva_capacidad =
-						estructura->capacidad * 2;
+				if (leidos == CANTIDAD_LEIDOS_POR_LINEA &&
+				    sin_basura_al_final &&
+				    pokemon_valido(actual) && rareza_valida &&
+				    !pokemon_esta_en_vector(
+					    actual, estructura->pokemones,
+					    estructura->cantidad)) {
+					if (estructura->cantidad >=
+					    estructura->capacidad) {
+						size_t nueva_capacidad =
+							estructura->capacidad *
+							2;
 
-					struct pokemon *aux = realloc(
-						estructura->pokemones,
-						sizeof(struct pokemon) *
-							nueva_capacidad);
-					if (!aux) {
-						free(nombre_pokemon);
-						hay_error = true;
-					} else {
-						estructura->pokemones = aux;
-						estructura->capacidad =
-							nueva_capacidad;
+						struct pokemon *aux = realloc(
+							estructura->pokemones,
+							sizeof(struct pokemon) *
+								nueva_capacidad);
+						if (!aux) {
+							free(nombre_pokemon);
+							hay_error = true;
+						} else {
+							estructura->pokemones =
+								aux;
+							estructura->capacidad =
+								nueva_capacidad;
+						}
 					}
+					if (!hay_error) {
+						estructura->pokemones
+							[estructura->cantidad] =
+							actual;
+						estructura->cantidad++;
+					}
+				} else {
+					free(nombre_pokemon);
 				}
-				if (!hay_error) {
-					estructura->pokemones
-						[estructura->cantidad] = actual;
-					estructura->cantidad++;
-				}
-			} else {
-				free(nombre_pokemon);
 			}
 		}
 	}
@@ -267,6 +274,11 @@ int guardar_pokemones(FILE *archivo, tp1_t *estructura)
  */
 tp1_t *tp1_leer_archivo(const char *nombre)
 {
+	if (!nombre) {
+		printf("Se debe especificar un nombre de archivo.\n");
+		return NULL;
+	}
+
 	FILE *archivo = fopen(nombre, LECTURA);
 	if (!archivo) {
 		printf("Hubo un problema al abrir el archivo.\n");
@@ -329,6 +341,9 @@ size_t tp1_cantidad(tp1_t *tp1)
  */
 tp1_t *tp1_combinar(tp1_t *tp1_a, tp1_t *tp1_b)
 {
+	if (!tp1_a || !tp1_b)
+		return NULL;
+
 	size_t i = 0, j = 0, cantidad_actual = 0;
 	bool hubo_error = false;
 
@@ -378,6 +393,8 @@ tp1_t *tp1_combinar(tp1_t *tp1_a, tp1_t *tp1_b)
 			if (sumar_j)
 				j++;
 			cantidad_actual++;
+		} else {
+			hubo_error = true;
 		}
 	}
 
@@ -426,8 +443,8 @@ tp1_t *tp1_combinar(tp1_t *tp1_a, tp1_t *tp1_b)
  */
 tp1_t *tp1_escribir_archivo(tp1_t *tp1, const char *nombre)
 {
-	if (tp1 == NULL) {
-		printf("Se envio un puntero a NULL.\n");
+	if (tp1 == NULL || nombre == NULL) {
+		printf("Se debe enviar un TP1 y un nombre valido.\n");
 		return NULL;
 	}
 
@@ -457,6 +474,9 @@ tp1_t *tp1_escribir_archivo(tp1_t *tp1, const char *nombre)
  */
 struct pokemon *tp1_buscar_pokemon(tp1_t *tp1, const char *nombre)
 {
+	if (!tp1 || !nombre)
+		return NULL;
+
 	size_t i = 0;
 	bool encontrado = false;
 
@@ -481,11 +501,11 @@ struct pokemon *tp1_buscar_pokemon(tp1_t *tp1, const char *nombre)
  */
 struct pokemon *tp1_buscar_orden(tp1_t *tp1, size_t n)
 {
-	if (n == 0 || n >= tp1->cantidad) {
+	if (tp1 == NULL || n >= tp1->cantidad) {
 		return NULL;
 	}
 
-	return &tp1->pokemones[n - 1];
+	return &tp1->pokemones[n];
 }
 
 /**

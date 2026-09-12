@@ -5,7 +5,7 @@
 
 #define ERROR -1
 
-const int CAPACIDAD_LECTURA = 10;
+const int CAPACIDAD_LECTURA = 128;
 /**
  * Lee caracteres por entrada estándar hasta encontrar el fin de línea (\n) o no
  * queden mas caracteres para leer.
