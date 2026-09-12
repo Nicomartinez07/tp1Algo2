@@ -8,8 +8,13 @@
 
 #define LECTURA "r"
 #define ESCRITURA "w"
-#define FORMATO_LECTURA_SIN_NOMBRE "%d,%f,%c"
+#define FORMATO_LECTURA_SIN_NOMBRE "%d,%f,%c\n"
 #define FORMATO_ESCRITURA "%s,%i,%f,%c\n"
+
+#define RARO 'R'
+#define COMUN 'C'
+#define LEGENDARIO 'L'
+
 struct tp1 {
   struct pokemon *pokemones;
   size_t cantidad;
@@ -24,15 +29,19 @@ const int POKEMON_NO_ENCONTRADO = 0;
 const float VELOCIDAD_MINIMA = 1;
 const int VELOCIDAD_MAXIMA = 99;
 const int CANTIDAD_LEIDOS_POR_LINEA = 3;
-const char COMUN = 'C';
-const char RARO = 'R';
-const char LEGENDARIO = 'L';
 const char CARACTER_COMA = ',';
+const char CARACTER_SALTO_LINEA = '\n';
+const char CARACTER_NULO = '\0';
 const int LONGITUD_INICIAL_NOMBRE = 100;
 
+/*
+ * Genera una copia del pokemon original en la copia. Se reserva el espacio necesario para el nombre del pokemon.
+ *
+ * En caso de error devuelve ERROR
+ */
 int duplicar_pokemon(struct pokemon original, struct pokemon *copia) {
   size_t longitud_nombre = strlen(original.nombre);
-  copia->nombre = malloc(sizeof(char) * longitud_nombre + 1);
+  copia->nombre = malloc((longitud_nombre + 1) * sizeof(char));
   if (!copia->nombre) {
     return ERROR;
   }
@@ -45,6 +54,9 @@ int duplicar_pokemon(struct pokemon original, struct pokemon *copia) {
   return EXITO;
 }
 
+/*
+ * Devuelve true si el pokemon actual se encuentra en el vector, false en caso contrario. La comparacion se realiza por nombre.
+ */
 bool pokemon_esta_en_vector(struct pokemon actual, struct pokemon *pokemones,
                             size_t tope) {
   bool encontrado = false;
@@ -58,6 +70,9 @@ bool pokemon_esta_en_vector(struct pokemon actual, struct pokemon *pokemones,
   return encontrado;
 }
 
+/*
+ * Devuelve true si el pokemon es valido, false en caso contrario. 
+ */
 bool pokemon_valido(struct pokemon actual) {
   bool peso_valido = actual.peso > PESO_MINIMO;
   bool velocidad_valida = actual.velocidad >= VELOCIDAD_MINIMA &&
@@ -69,39 +84,54 @@ bool pokemon_valido(struct pokemon actual) {
   return (peso_valido && velocidad_valida && rareza_apta);
 }
 
+/*
+ * Dado un caracter que representa la rareza, devuelve la rareza correspondiente en el enum.
+ *
+ * En caso de que sea invalida devuelve false
+ */
 bool convertir_caracter_a_rareza(char caracter, enum rareza_pokemon *rareza) {
-  bool valida = false;
-  if (caracter == COMUN) {
-    valida = true;
-    *rareza = RAREZA_COMUN;
-  } else if (caracter == LEGENDARIO) {
-    valida = true;
-    *rareza = RAREZA_LEGENDARIO;
-  } else if (caracter == RARO) {
-    valida = true;
-    *rareza = RAREZA_RARO;
-  }
+    switch (caracter) {
+        case COMUN:
+            *rareza = RAREZA_COMUN;
+            return true;
 
-  return valida;
+        case LEGENDARIO:
+            *rareza = RAREZA_LEGENDARIO;
+            return true;
+
+        case RARO:
+            *rareza = RAREZA_RARO;
+            return true;
+
+        default:
+            return false;
+    }
 }
 
+/*
+ * Dado la rareza, devuelve un caracter correspondiente a ese tipo de rareza.
+ */
 char convertir_rareza_a_caracter(enum rareza_pokemon rareza) {
   char caracter = ' ';
   switch (rareza) {
-  case RAREZA_COMUN:
-    caracter = COMUN;
-    break;
-  case RAREZA_LEGENDARIO:
-    caracter = LEGENDARIO;
-    break;
-  case RAREZA_RARO:
-    caracter = RARO;
-    break;
+    case RAREZA_COMUN:
+      caracter = COMUN;
+      break;
+    case RAREZA_LEGENDARIO:
+      caracter = LEGENDARIO;
+      break;
+    case RAREZA_RARO:
+      caracter = RARO;
+      break;
   }
 
   return caracter;
 }
 
+/*
+ * Ordena el vector de pokemones por nombre.
+ * Tope tiene que representar la cantidad de elementos del vector.
+ */
 void ordenar_vector(struct pokemon *pokemones, size_t tope) {
   if (tope <= 1 || pokemones == NULL) {
     return;
@@ -121,6 +151,8 @@ void ordenar_vector(struct pokemon *pokemones, size_t tope) {
 }
 
 /*
+ *  El archivo tiene que estar abierto en modo lectura. Lee el archivo y guarda los pokemones en la estructura.
+ *  Devuelve ERROR en caso de error.
  */
 int guardar_pokemones(FILE *archivo, tp1_t *estructura) {
   bool hay_error = false;
@@ -150,12 +182,15 @@ int guardar_pokemones(FILE *archivo, tp1_t *estructura) {
       int velocidad = 0;
       float peso = 0;
 
-      int leidos = sscanf(coma + 1, FORMATO_LECTURA_SIN_NOMBRE, &velocidad,
-                          &peso, &caracter_rareza);
+      int caracteres_leidos = 0;
+      int leidos = sscanf(coma + 1, "%d,%f,%c%n", &velocidad, &peso, &caracter_rareza, &caracteres_leidos);
+
+      bool sin_basura_al_final = ((coma + 1)[caracteres_leidos] == CARACTER_SALTO_LINEA 
+                                  || (coma + 1)[caracteres_leidos] == CARACTER_NULO);
 
       enum rareza_pokemon rareza;
-      bool rareza_es_valida =
-          convertir_caracter_a_rareza(caracter_rareza, &rareza);
+      bool rareza_valida = convertir_caracter_a_rareza(caracter_rareza, &rareza);
+
 
       struct pokemon actual;
       actual.nombre = nombre_pokemon;
@@ -163,8 +198,7 @@ int guardar_pokemones(FILE *archivo, tp1_t *estructura) {
       actual.velocidad = velocidad;
       actual.rareza = rareza;
 
-      if (leidos == CANTIDAD_LEIDOS_POR_LINEA && pokemon_valido(actual) &&
-          rareza_es_valida &&
+      if (leidos == CANTIDAD_LEIDOS_POR_LINEA && sin_basura_al_final && pokemon_valido(actual) && rareza_valida &&
           !pokemon_esta_en_vector(actual, estructura->pokemones,
                                   estructura->cantidad)) {
 
@@ -412,12 +446,11 @@ struct pokemon *tp1_buscar_pokemon(tp1_t *tp1, const char *nombre) {
  * En caso de error devuelve NULL
  */
 struct pokemon *tp1_buscar_orden(tp1_t *tp1, size_t n) {
-  if (n >= tp1->cantidad) {
-    printf("Hay menos pokemones en el tp1 que N elementos");
+  if (n == 0 || n >= tp1->cantidad) {
     return NULL;
   }
 
-  return &tp1->pokemones[n];
+  return &tp1->pokemones[n-1];
 }
 
 /**

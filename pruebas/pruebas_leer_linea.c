@@ -8,7 +8,7 @@
 
 #define LECTURA "r"
 
-void prueba_leer_linea_bascia() {
+void prueba_leer_linea_basica() {
   FILE *archivo_prueba = fopen("./pruebas/archivos/prueba1.txt", LECTURA);
   if (!archivo_prueba) {
     pa2m_afirmar(false, "No se pudo abrir el archivo para ejecutar la prueba");
@@ -74,7 +74,7 @@ void prueba_leer_linea_ptr() {
 
 void pruebas_leer_linea() {
   pa2m_nuevo_grupo("Pruebas leer_linea");
-  prueba_leer_linea_bascia();
+  prueba_leer_linea_basica();
   prueba_linea_larga_leida_correctamente();
   prueba_archivo_vacio();
 
