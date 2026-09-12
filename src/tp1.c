@@ -35,7 +35,8 @@ const char CARACTER_NULO = '\0';
 const int LONGITUD_INICIAL_NOMBRE = 100;
 
 /*
- * Genera una copia del pokemon original en la copia. Se reserva el espacio necesario para el nombre del pokemon.
+ * Genera una copia del pokemon original en la copia. Se reserva el espacio
+ * necesario para el nombre del pokemon.
  *
  * En caso de error devuelve ERROR
  */
@@ -55,7 +56,8 @@ int duplicar_pokemon(struct pokemon original, struct pokemon *copia) {
 }
 
 /*
- * Devuelve true si el pokemon actual se encuentra en el vector, false en caso contrario. La comparacion se realiza por nombre.
+ * Devuelve true si el pokemon actual se encuentra en el vector, false en caso
+ * contrario. La comparacion se realiza por nombre.
  */
 bool pokemon_esta_en_vector(struct pokemon actual, struct pokemon *pokemones,
                             size_t tope) {
@@ -71,7 +73,7 @@ bool pokemon_esta_en_vector(struct pokemon actual, struct pokemon *pokemones,
 }
 
 /*
- * Devuelve true si el pokemon es valido, false en caso contrario. 
+ * Devuelve true si el pokemon es valido, false en caso contrario.
  */
 bool pokemon_valido(struct pokemon actual) {
   bool peso_valido = actual.peso > PESO_MINIMO;
@@ -85,27 +87,28 @@ bool pokemon_valido(struct pokemon actual) {
 }
 
 /*
- * Dado un caracter que representa la rareza, devuelve la rareza correspondiente en el enum.
+ * Dado un caracter que representa la rareza, devuelve la rareza correspondiente
+ * en el enum.
  *
  * En caso de que sea invalida devuelve false
  */
 bool convertir_caracter_a_rareza(char caracter, enum rareza_pokemon *rareza) {
-    switch (caracter) {
-        case COMUN:
-            *rareza = RAREZA_COMUN;
-            return true;
+  switch (caracter) {
+  case COMUN:
+    *rareza = RAREZA_COMUN;
+    return true;
 
-        case LEGENDARIO:
-            *rareza = RAREZA_LEGENDARIO;
-            return true;
+  case LEGENDARIO:
+    *rareza = RAREZA_LEGENDARIO;
+    return true;
 
-        case RARO:
-            *rareza = RAREZA_RARO;
-            return true;
+  case RARO:
+    *rareza = RAREZA_RARO;
+    return true;
 
-        default:
-            return false;
-    }
+  default:
+    return false;
+  }
 }
 
 /*
@@ -114,15 +117,15 @@ bool convertir_caracter_a_rareza(char caracter, enum rareza_pokemon *rareza) {
 char convertir_rareza_a_caracter(enum rareza_pokemon rareza) {
   char caracter = ' ';
   switch (rareza) {
-    case RAREZA_COMUN:
-      caracter = COMUN;
-      break;
-    case RAREZA_LEGENDARIO:
-      caracter = LEGENDARIO;
-      break;
-    case RAREZA_RARO:
-      caracter = RARO;
-      break;
+  case RAREZA_COMUN:
+    caracter = COMUN;
+    break;
+  case RAREZA_LEGENDARIO:
+    caracter = LEGENDARIO;
+    break;
+  case RAREZA_RARO:
+    caracter = RARO;
+    break;
   }
 
   return caracter;
@@ -151,8 +154,8 @@ void ordenar_vector(struct pokemon *pokemones, size_t tope) {
 }
 
 /*
- *  El archivo tiene que estar abierto en modo lectura. Lee el archivo y guarda los pokemones en la estructura.
- *  Devuelve ERROR en caso de error.
+ *  El archivo tiene que estar abierto en modo lectura. Lee el archivo y guarda
+ * los pokemones en la estructura. Devuelve ERROR en caso de error.
  */
 int guardar_pokemones(FILE *archivo, tp1_t *estructura) {
   bool hay_error = false;
@@ -183,14 +186,16 @@ int guardar_pokemones(FILE *archivo, tp1_t *estructura) {
       float peso = 0;
 
       int caracteres_leidos = 0;
-      int leidos = sscanf(coma + 1, "%d,%f,%c%n", &velocidad, &peso, &caracter_rareza, &caracteres_leidos);
+      int leidos = sscanf(coma + 1, "%d,%f,%c%n", &velocidad, &peso,
+                          &caracter_rareza, &caracteres_leidos);
 
-      bool sin_basura_al_final = ((coma + 1)[caracteres_leidos] == CARACTER_SALTO_LINEA 
-                                  || (coma + 1)[caracteres_leidos] == CARACTER_NULO);
+      bool sin_basura_al_final =
+          ((coma + 1)[caracteres_leidos] == CARACTER_SALTO_LINEA ||
+           (coma + 1)[caracteres_leidos] == CARACTER_NULO);
 
       enum rareza_pokemon rareza;
-      bool rareza_valida = convertir_caracter_a_rareza(caracter_rareza, &rareza);
-
+      bool rareza_valida =
+          convertir_caracter_a_rareza(caracter_rareza, &rareza);
 
       struct pokemon actual;
       actual.nombre = nombre_pokemon;
@@ -198,7 +203,8 @@ int guardar_pokemones(FILE *archivo, tp1_t *estructura) {
       actual.velocidad = velocidad;
       actual.rareza = rareza;
 
-      if (leidos == CANTIDAD_LEIDOS_POR_LINEA && sin_basura_al_final && pokemon_valido(actual) && rareza_valida &&
+      if (leidos == CANTIDAD_LEIDOS_POR_LINEA && sin_basura_al_final &&
+          pokemon_valido(actual) && rareza_valida &&
           !pokemon_esta_en_vector(actual, estructura->pokemones,
                                   estructura->cantidad)) {
 
@@ -450,7 +456,7 @@ struct pokemon *tp1_buscar_orden(tp1_t *tp1, size_t n) {
     return NULL;
   }
 
-  return &tp1->pokemones[n-1];
+  return &tp1->pokemones[n - 1];
 }
 
 /**
