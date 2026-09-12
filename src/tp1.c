@@ -555,6 +555,7 @@ struct pokemon *tp1_buscar_orden(tp1_t *tp1, size_t n)
  */
 size_t tp1_iterar(tp1_t *tp1, bool (*f)(struct pokemon *, void *), void *extra)
 {
+	if(tp1 != NULL && f != NULL) return 0;
 	size_t contador = 0;
 
 	bool seguir = true;
