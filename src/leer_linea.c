@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define ERROR -1
 
@@ -15,6 +16,8 @@ const int CAPACIDAD_LECTURA = 128;
  */
 char *leer_linea(FILE *archivo)
 {
+	if (!archivo)
+		return NULL;
 	size_t tamaño_lectura = CAPACIDAD_LECTURA;
 	size_t capacidad = tamaño_lectura;
 	size_t uso_actual = 0;
@@ -22,13 +25,11 @@ char *leer_linea(FILE *archivo)
 
 	char *string = malloc(sizeof(char) * tamaño_lectura);
 	if (!string) {
-		printf("Hubo un error al reservar el string \n");
 		return NULL;
 	}
 
 	char *linea_actual = malloc(sizeof(char) * tamaño_lectura);
 	if (!linea_actual) {
-		printf("Hubo un error al reservar la linea \n");
 		free(string);
 		return NULL;
 	}
@@ -41,7 +42,6 @@ char *leer_linea(FILE *archivo)
 			capacidad *= 2;
 			char *aux = realloc(string, capacidad);
 			if (!aux) {
-				printf("Hubo un error al reservar el nuevo string \n");
 				free(string);
 				free(linea_actual);
 				return NULL;
@@ -83,13 +83,14 @@ char *leer_linea(FILE *archivo)
  */
 int leer_linea_ptr(char **ptr, size_t *tamaño, FILE *archivo)
 {
+	if (!ptr || !tamaño || !archivo)
+		return ERROR;
 	size_t uso_actual = 0;
 	size_t tamaño_lectura = CAPACIDAD_LECTURA;
 	bool leyo_cosas = false;
 
 	char *linea_actual = malloc(sizeof(char) * tamaño_lectura);
 	if (!linea_actual) {
-		printf("Hubo un error al reservar la linea \n");
 		return ERROR;
 	}
 
@@ -98,7 +99,6 @@ int leer_linea_ptr(char **ptr, size_t *tamaño, FILE *archivo)
 
 		char *aux = realloc(*ptr, nuevo_tamaño);
 		if (!aux) {
-			printf("Hubo un error al reservar el nuevo puntero \n");
 			free(linea_actual);
 			return ERROR;
 		}
@@ -120,7 +120,6 @@ int leer_linea_ptr(char **ptr, size_t *tamaño, FILE *archivo)
 
 			char *aux = realloc(*ptr, nuevo_tamaño);
 			if (!aux) {
-				printf("Hubo un error al reservar el nuevo puntero \n");
 				free(linea_actual);
 				return ERROR;
 			}

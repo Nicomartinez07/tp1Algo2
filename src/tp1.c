@@ -25,14 +25,9 @@ const size_t CAPACIDAD_INICIAL = 10;
 const int ERROR = -1;
 const int EXITO = 0;
 const int PESO_MINIMO = 0;
-const int POKEMON_NO_ENCONTRADO = 0;
 const float VELOCIDAD_MINIMA = 1;
 const int VELOCIDAD_MAXIMA = 99;
 const int CANTIDAD_LEIDOS_POR_LINEA = 3;
-const char CARACTER_COMA = ',';
-const char CARACTER_SALTO_LINEA = '\n';
-const char CARACTER_NULO = '\0';
-const int LONGITUD_INICIAL_NOMBRE = 100;
 
 /*
  * Genera una copia del pokemon original en la copia. Se reserva el espacio
@@ -167,7 +162,7 @@ int guardar_pokemones(FILE *archivo, tp1_t *estructura)
 
 	while (leer_linea_ptr(&linea, &tamaño_inicial, archivo) >= 0 &&
 	       !hay_error) {
-		char *coma = strchr(linea, CARACTER_COMA);
+		char *coma = strchr(linea, ',');
 
 		if (coma != NULL) {
 			size_t longitud_nombre = (size_t)(coma - linea);
@@ -300,20 +295,17 @@ int guardar_pokemones(FILE *archivo, tp1_t *estructura)
 tp1_t *tp1_leer_archivo(const char *nombre)
 {
 	if (!nombre) {
-		printf("Se debe especificar un nombre de archivo.\n");
 		return NULL;
 	}
 
 	FILE *archivo = fopen(nombre, LECTURA);
 	if (!archivo) {
-		printf("Hubo un problema al abrir el archivo.\n");
 		return NULL;
 	}
 
 	tp1_t *tp1 = malloc(sizeof(tp1_t));
 	if (!tp1) {
 		fclose(archivo);
-		printf("Hubo un error al reservar memoria para la estructura tp1.\n");
 		return NULL;
 	}
 
@@ -321,7 +313,6 @@ tp1_t *tp1_leer_archivo(const char *nombre)
 	tp1->capacidad = CAPACIDAD_INICIAL;
 	tp1->pokemones = malloc(sizeof(struct pokemon) * (tp1->capacidad));
 	if (!tp1->pokemones) {
-		printf("Hubo un error al reservar memoria para el vector de pokemones.\n");
 		fclose(archivo);
 		free(tp1);
 		return NULL;
@@ -331,8 +322,6 @@ tp1_t *tp1_leer_archivo(const char *nombre)
 	fclose(archivo);
 
 	if (resultado == ERROR) {
-		printf("Hubo un error al reservar memoria para el buffer que permite leer "
-		       "linea.\n");
 		free(tp1);
 		return NULL;
 	}
@@ -348,9 +337,8 @@ tp1_t *tp1_leer_archivo(const char *nombre)
  */
 size_t tp1_cantidad(tp1_t *tp1)
 {
-	if (tp1 == NULL) {
+	if (!tp1)
 		return 0;
-	}
 	return tp1->cantidad;
 }
 
@@ -372,15 +360,12 @@ tp1_t *tp1_combinar(tp1_t *tp1_a, tp1_t *tp1_b)
 
 	tp1_t *aux = malloc(sizeof(tp1_t));
 	if (!aux) {
-		printf("Hubo un error al reservar memoria para la estructura tp1.\n");
 		return NULL;
 	}
 
 	size_t capacidad_minima = tp1_a->cantidad + tp1_b->cantidad;
 	aux->pokemones = malloc(sizeof(struct pokemon) * capacidad_minima);
 	if (!aux->pokemones) {
-		printf("Hubo un error al reservar memoria para los pokemones del nuevo "
-		       "TP1.\n");
 		free(aux);
 		return NULL;
 	}
@@ -466,14 +451,12 @@ tp1_t *tp1_combinar(tp1_t *tp1_a, tp1_t *tp1_b)
  */
 tp1_t *tp1_escribir_archivo(tp1_t *tp1, const char *nombre)
 {
-	if (tp1 == NULL || nombre == NULL) {
-		printf("Se debe enviar un TP1 y un nombre valido.\n");
+	if (!tp1 || !nombre) {
 		return NULL;
 	}
 
 	FILE *archivo = fopen(nombre, ESCRITURA);
 	if (!archivo) {
-		printf("Hubo un problema al abrir el archivo.\n");
 		return NULL;
 	}
 
@@ -560,7 +543,6 @@ size_t tp1_iterar(tp1_t *tp1, bool (*f)(struct pokemon *, void *), void *extra)
 void *tp1_destruir(tp1_t *tp1)
 {
 	if (tp1 == NULL) {
-		printf("Se envio un puntero a NULL.\n");
 		return NULL;
 	}
 

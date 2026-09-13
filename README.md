@@ -1,4 +1,4 @@
-<p align="center"><a href="https://xanubot.a2m.com.ar/jobs/1330"><img src="https://xanubot.a2m.com.ar/badges/1330" alt="Xanubot"></a>
+<p align="center"><a href="https://xanubot.a2m.com.ar/jobs/1660"><img src="https://xanubot.a2m.com.ar/badges/1660" alt="Xanubot"></a>
 
 <div align="right">
     <img width="32px" src="img/algo2.svg">
@@ -121,16 +121,3 @@ Para implementar el....
 
 ### 5.3 ¿Cuál fue el...?
 El motivo fue....
-
-
-
-
-
-
-
-
-clang-format -i -style=file main.c
-clang-format -i -style=file src/*.c
-clang-format -i -style=file src/*.h
-clang-format -i -style=file pruebas/*.c
-clang-format -i -style=file pruebas/*.h
