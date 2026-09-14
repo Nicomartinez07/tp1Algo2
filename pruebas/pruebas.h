@@ -18,4 +18,6 @@ void pruebas_combinar();
 
 void pruebas_archivos();
 
+void pruebas_iterar();
+
 #endif // PRUEBAS_H_
