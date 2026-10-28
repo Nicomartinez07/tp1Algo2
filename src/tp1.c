@@ -55,7 +55,7 @@ bool iterar_archivo(tp1_t *estructura, tp1_t *aux, size_t *cantidad_actual) {
 		}
 	}
 
-	return hubo_error
+	return hubo_error;
 }
 
 /*
