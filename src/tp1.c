@@ -30,6 +30,35 @@ const int VELOCIDAD_MAXIMA = 99;
 const int CANTIDAD_LEIDOS_POR_LINEA = 3;
 
 /*
+ * Libera toda la memoria asociada a una estructura.
+ */
+void liberar_memoria_estructura(tp1_t *estructura) {
+	for (size_t i = 0; i < estructura->cantidad; i++) {
+			free(estructura->pokemones[i].nombre);
+	}
+	free(estructura->pokemones);
+	free(estructura);
+}
+
+
+bool iterar_archivo(tp1_t *estructura, tp1_t *aux, size_t *cantidad_actual) {
+	size_t i = 0;
+	bool hubo_error = false;
+	while (i < estructura->cantidad && !hubo_error) {
+		int resultado = duplicar_pokemon(
+			estructura->pokemones[i], &aux->pokemones[*cantidad_actual]);
+		if (resultado == EXITO) {
+			i++;
+			(*cantidad_actual)++;
+		} else {
+			hubo_error = true;
+		}
+	}
+
+	return hubo_error
+}
+
+/*
  * Genera una copia del pokemon original en la copia. Se reserva el espacio
  * necesario para el nombre del pokemon.
  *
@@ -62,25 +91,29 @@ size_t buscar_posicion_para_insertar(struct pokemon *pokemones, size_t cantidad,
 {
 	size_t inicio = 0;
 	size_t fin = cantidad;
+	size_t posicion = 0;
+	bool encontro_pokemon = false;
 
-	while (inicio < fin) {
+	while (inicio < fin && !encontro_pokemon) {
 		size_t centro = inicio + (fin - inicio) / 2;
 		int comparacion = strcasecmp(pokemones[centro].nombre, nombre);
 
 		if (comparacion == 0) {
 			*encontrado = true;
-			return centro;
-		}
-
-		if (comparacion < 0) {
+			encontro_pokemon = true;
+			posicion = centro;
+		} else if (comparacion < 0) {
 			inicio = centro + 1;
 		} else {
 			fin = centro;
 		}
 	}
 
-	*encontrado = false;
-	return inicio;
+	if(!encontro_pokemon) {
+		*encontrado = false;
+		posicion = inicio;
+	}
+	return posicion;
 }
 
 /*
@@ -322,7 +355,7 @@ tp1_t *tp1_leer_archivo(const char *nombre)
 	fclose(archivo);
 
 	if (resultado == ERROR) {
-		free(tp1);
+		liberar_memoria_estructura(tp1);
 		return NULL;
 	}
 
@@ -431,14 +464,9 @@ tp1_t *tp1_combinar(tp1_t *tp1_a, tp1_t *tp1_b)
 	aux->cantidad = cantidad_actual;
 
 	if (hubo_error) {
-		for (size_t i = 0; i < aux->cantidad; i++) {
-			free(aux->pokemones[i].nombre);
-		}
-		free(aux->pokemones);
-		free(aux);
+		liberar_memoria_estructura(aux);
 		return NULL;
 	}
-
 	return aux;
 }
 
@@ -542,14 +570,9 @@ size_t tp1_iterar(tp1_t *tp1, bool (*f)(struct pokemon *, void *), void *extra)
  */
 void *tp1_destruir(tp1_t *tp1)
 {
-	if (tp1 == NULL) {
+	if (!tp1) 
 		return NULL;
-	}
 
-	for (size_t i = 0; i < tp1->cantidad; i++) {
-		free(tp1->pokemones[i].nombre);
-	}
-	free(tp1->pokemones);
-	free(tp1);
+	liberar_memoria_estructura(tp1);
 	return NULL;
 }

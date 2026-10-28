@@ -8,6 +8,7 @@
 #define MOSTRAR_RAREZAS "mostrar-rarezas"
 #define BUSCAR_NOMBRE "buscar-nombre"
 #define ERROR -1
+#define EXiTO 0
 
 const int CANTIDAD_MINIMA_PARAMETROS = 3;
 const int CANTIDAD_BUSCAR_NOMBRE = 4;
@@ -62,7 +63,7 @@ int main(int argc, char const *argv[])
 	srand((unsigned int)time(NULL));
 
 	tp1_t *pokedex = tp1_leer_archivo(argv[1]);
-	if (pokedex == NULL) {
+	if (!pokedex) {
 		return ERROR;
 	}
 
@@ -140,5 +141,5 @@ int main(int argc, char const *argv[])
 	if (hay_error) {
 		return ERROR;
 	}
-	return 0;
+	return EXiTO;
 }
