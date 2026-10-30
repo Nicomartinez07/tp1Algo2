@@ -407,7 +407,7 @@ tp1_t *tp1_combinar(tp1_t *tp1_a, tp1_t *tp1_b)
 		return NULL;
 	}
 
-	while (i < lista_cantidad(tp1_a->pokemones) && j < tp1_b->cantidad && !hubo_error) {
+	while (i < lista_cantidad(tp1_a->pokemones) && j <lista_cantidad(tp1_b->pokemones) && !hubo_error) {
 		int comparacion = strcasecmp(tp1_a->pokemones[i].nombre,
 					     tp1_b->pokemones[j].nombre);
 		int resultado;
