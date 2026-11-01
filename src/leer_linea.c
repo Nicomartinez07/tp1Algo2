@@ -24,7 +24,7 @@ bool agrandar_memoria(char **ptr, size_t *capacidad, size_t tamaño_necesario)
 	size_t nueva_capacidad = *capacidad;
 
 	if (nueva_capacidad == 0)
-		nueva_capacidad = CAPACIDAD_LECTURA;
+		nueva_capacidad = (size_t)CAPACIDAD_LECTURA;
 
 	while (nueva_capacidad < tamaño_necesario)
 		nueva_capacidad *= 2;
@@ -39,61 +39,8 @@ bool agrandar_memoria(char **ptr, size_t *capacidad, size_t tamaño_necesario)
 	return true;
 }
 
-/**
- * Lee caracteres por entrada estándar hasta encontrar el fin de línea (\n) o no
- * queden mas caracteres para leer.
- *
- * Devuelve un puntero a un string reservado dinámicamente con malloc a liberar
- * por el usuario utilizando free o NULL en caso de error.
- */
-char *leer_linea(FILE *archivo)
-{
-	if (!archivo)
-		return NULL;
-	size_t tamaño_lectura = CAPACIDAD_LECTURA;
-	size_t capacidad = tamaño_lectura;
-	size_t uso_actual = 0;
-	bool leyo_cosas = false;
 
-	char *string = malloc(sizeof(char) * tamaño_lectura);
-	if (!string) {
-		return NULL;
-	}
 
-	char *linea_actual = malloc(sizeof(char) * tamaño_lectura);
-	if (!linea_actual) {
-		free(string);
-		return NULL;
-	}
-
-	while (fgets(linea_actual, (int)tamaño_lectura, archivo) != NULL) {
-		size_t leidos = strlen(linea_actual);
-		leyo_cosas = true;
-
-		if (!agrandar_memoria(&string, &capacidad,
-				      uso_actual + leidos + 1)) {
-			free(string);
-			free(linea_actual);
-			return NULL;
-		}
-
-		strcpy(string + uso_actual, linea_actual);
-		uso_actual += leidos;
-
-		if (leidos < tamaño_lectura - 1 ||
-		    linea_actual[leidos - 1] == '\n') {
-			break;
-		}
-	}
-	free(linea_actual);
-
-	if (!leyo_cosas) {
-		free(string);
-		return NULL;
-	}
-
-	return string;
-}
 
 /*
  * Lee caracteres por entrada estándar hasta encontrar el fin de línea o no
@@ -114,7 +61,7 @@ int leer_linea_ptr(char **ptr, size_t *tamaño, FILE *archivo)
 		return ERROR;
 
 	size_t uso_actual = 0;
-	size_t tamaño_lectura = CAPACIDAD_LECTURA;
+	size_t tamaño_lectura = (size_t)CAPACIDAD_LECTURA;
 	bool leyo_cosas = false;
 
 	char *linea_actual = malloc(sizeof(char) * tamaño_lectura);
@@ -126,22 +73,28 @@ int leer_linea_ptr(char **ptr, size_t *tamaño, FILE *archivo)
 		return ERROR;
 	}
 
-	while (fgets(linea_actual, (int)tamaño_lectura, archivo) != NULL) {
+	bool termina_linea = false;
+
+	while (!termina_linea && fgets(linea_actual, (int)tamaño_lectura, archivo) != NULL) {
 		size_t leidos = strlen(linea_actual);
 		leyo_cosas = true;
+
+		char *salto_linea = strchr(linea_actual, '\n');
+
+        if (salto_linea) {
+            leidos = (size_t)(salto_linea - linea_actual);
+            termina_linea = true;
+        }
 
 		if (!agrandar_memoria(ptr, tamaño, uso_actual + leidos + 1)) {
 			free(linea_actual);
 			return ERROR;
 		}
 
-		strcpy(*ptr + uso_actual, linea_actual);
+		memcpy(*ptr + uso_actual, linea_actual, leidos);
 		uso_actual += leidos;
 
-		if (leidos < tamaño_lectura - 1 ||
-		    linea_actual[leidos - 1] == '\n') {
-			break;
-		}
+		(*ptr)[uso_actual] = '\0';
 	}
 
 	free(linea_actual);
@@ -150,4 +103,32 @@ int leer_linea_ptr(char **ptr, size_t *tamaño, FILE *archivo)
 		return ERROR;
 
 	return (int)uso_actual;
+}
+
+
+/**
+ * Lee caracteres por entrada estándar hasta encontrar el fin de línea (\n) o no
+ * queden mas caracteres para leer.
+ *
+ * Devuelve un puntero a un string reservado dinámicamente con malloc a liberar
+ * por el usuario utilizando free o NULL en caso de error.
+ */
+char *leer_linea(FILE *archivo)
+{
+	if (!archivo)
+		return NULL;
+	size_t capacidad = (size_t)CAPACIDAD_LECTURA;
+
+	char *string = malloc(sizeof(char) * capacidad);
+	if (!string) 
+		return NULL;
+
+	
+	int leidos = leer_linea_ptr(&string, &capacidad, archivo);
+	if(leidos == ERROR) {
+		free(string);
+		return NULL;
+	}
+
+	return string;
 }
